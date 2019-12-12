@@ -6,11 +6,11 @@ package tools.excel2sqlite;
  */
 public class App 
 {
-    public static void main( String[] args ) throws Exception
+    public static void main(String[] args ) throws Exception
     {
         System.out.println( "Hello World!" );
         
         Excel2Sqlite exc = new Excel2Sqlite();
-        exc.operate();
+        exc.operate(args[0], args[1]);
     }
 }

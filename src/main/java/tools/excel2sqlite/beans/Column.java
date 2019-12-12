@@ -1,4 +1,4 @@
-package tools.excel2sqlite;
+package tools.excel2sqlite.beans;
 
 public class Column {
 	
