@@ -1,4 +1,3 @@
 # excel2sqlite
-Make sqlite DB from google spreadsheet.
+Make sqlite database from excel.
 
-Have not finished yet.
