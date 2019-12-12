@@ -17,26 +17,30 @@ import tools.excel2sqlite.beans.DataTable;
 
 public class Excel2Sqlite {
 
-	public void operate(String xls, String database) throws Exception {
-		System.out.println("Excel file: " + xls);
+	public void operate(String excel, String database, String systemTable) throws Exception {
+
 		System.out.println("Database file: " + database);
-		// java.io.Fileから
-		Workbook workbook = WorkbookFactory.create(new File(xls));
+		String[] excels = excel.split(",");
 		new File(database).delete();
-		// シート名がわかっている場合
-		Sheet sheet = workbook.getSheet("SYS_TABLES");
+		for (String e : excels) {
+			System.out.println("Excel file: " + e);
+			// java.io.Fileから
+			Workbook workbook = WorkbookFactory.create(new File(e));
+			// シート名がわかっている場合
+			Sheet sheet = workbook.getSheet(systemTable);
 
-		if (sheet == null) {
-			throw new Exception("There is no sheet called SYS_TABLES.");
-		}
+			if (sheet == null) {
+				throw new Exception("There is no sheet called SYS_TABLES.");
+			}
 
-		List<Cell> cells = getAllCell(sheet);
-		List<DataTable> tables = creatTables(sheet, cells);
-		this.fillData(workbook, tables);
+			List<Cell> cells = getAllCell(sheet);
+			List<DataTable> tables = creatTables(sheet, cells);
+			this.fillData(workbook, tables);
 
-		IDatabaseAssistant da = new SqliteAssistant();
-		if (da.createDatabase(database)) {
-			da.createTables(tables, database);
+			IDatabaseAssistant da = new SqliteAssistant();
+			if (da.createDatabase(database)) {
+				da.createTables(tables, database);
+			}
 		}
 	}
 
@@ -82,6 +86,7 @@ public class Excel2Sqlite {
 			}
 		}
 
+		System.out.println("Table:" + table.getName());
 		int ci = 2;
 		String columnName = null;
 		List<Column> columns = new ArrayList<Column>();
@@ -89,6 +94,9 @@ public class Excel2Sqlite {
 		// Default Comment
 		while (true) {
 			int rowIndex = cell.getRowIndex() + ci;
+			if (sheet.getRow(rowIndex) == null) {
+				break;
+			}
 			columnName = sheet.getRow(rowIndex).getCell(0).getStringCellValue();
 			if ("".equals(columnName) || columnName == null) {
 				break;
@@ -115,7 +123,7 @@ public class Excel2Sqlite {
 	public void fillData(Workbook workbook, List<DataTable> tables) {
 		for (DataTable t : tables) {
 			List<List<Object>> rows = new ArrayList<List<Object>>();
-			int incremenValue = 1;
+			int incrementValue = 1;
 			for (String sheetName : t.getDataSheets()) {
 				Sheet sheet = workbook.getSheet(sheetName);
 				System.out.println("Getting data:" + sheetName);
@@ -128,7 +136,7 @@ public class Excel2Sqlite {
 					List<Object> columns = new ArrayList<Object>();
 					for (int c = 0; c < columnCount; c++) {
 						if (t.getColumns().get(c).isPrimaryKey() && t.getColumns().get(c).isAutoIncrement()) {
-							columns.add(getCellValue(row.getCell(c)) == null ? null: incremenValue++);
+							columns.add(getCellValue(row.getCell(c)) == null ? null : incrementValue++);
 						} else {
 							columns.add(getCellValue(row.getCell(c)));
 						}
@@ -150,6 +158,8 @@ public class Excel2Sqlite {
 	}
 
 	private Object getCellValue(Cell cell) {
+		if (cell == null)
+			return null;
 		switch (cell.getCellType()) {
 		case Cell.CELL_TYPE_BOOLEAN:
 			return cell.getBooleanCellValue();
