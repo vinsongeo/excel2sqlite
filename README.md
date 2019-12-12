@@ -12,3 +12,6 @@ args:
 - Database file name: test.db
 - System table name: this name is linked to an excel sheet which contains tables definition.
 
+### Example
+
+java -jar e2s.jar "/Users/me/output/1.xlsx,/Users/me/output/2.xlsx" "/Users/me/output/test.db" "SYS_TABLES"
