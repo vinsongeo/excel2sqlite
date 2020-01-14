@@ -126,6 +126,8 @@ public class Excel2Sqlite {
 			int incrementValue = 1;
 			for (String sheetName : t.getDataSheets()) {
 				Sheet sheet = workbook.getSheet(sheetName);
+				if (sheet == null)
+					continue;
 				System.out.println("Getting data:" + sheetName);
 				int columnCount = t.getColumns().size();
 
